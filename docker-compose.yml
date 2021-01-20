@@ -1,0 +1,77 @@
+version: '3'
+
+volumes:
+  db-data:
+    driver: local
+  pg-admin-data:
+    driver: local
+
+services:
+  base: &base
+    hostname: base
+    image: boilerplate
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+
+  db:
+    hostname: db
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "15432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  pgadmin:
+    hostname: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "dev@com.br"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    ports:
+      - "6001:80"
+    volumes:
+      - pg-admin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+
+  app:
+    <<: *base
+    command: /bin/ash -c "npm install && npm run dev"
+    environment:
+      SECRETE_KEY_JWT: 5ce240f7d1e50058ce978753a714a2e6
+      APPLICATION_PORT: 3009
+      HOST_DATABASE: db
+      PORT_DATABASE: 5432
+      USER_DATABASE: postgres
+      PASSWORD_DATABASE: 1234
+      DATABASE: boilerplate_development
+      NODE_ENV: development
+      NODE_PATH: .
+    volumes:
+      - .:/app
+    ports:
+      - "3009:3009"
+    depends_on:
+      - db
+
+  tst:
+    <<: *base
+    command: /bin/ash -c "npm run test"
+    environment:
+      SECRETE_KEY_JWT: some-secret
+      HOST_DATABASE: db
+      PORT_DATABASE: 5432
+      USER_DATABASE: postgres
+      PASSWORD_DATABASE: 1234
+      DATABASE: boilerplate_development_test
+      NODE_ENV: test
+      NODE_PATH: .
+    volumes:
+      - .:/app
+    depends_on:
+      - db

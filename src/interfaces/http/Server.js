@@ -13,7 +13,7 @@ class Server {
   start() {
     return new Promise((resolve) => {
       const http = this.express
-        .listen(this.config.web.port, () => {
+        .listen(process.env.APPLICATION_PORT, () => {
           const { port } = http.address();
           this.logger.info(`[p ${process.pid}] Listening at port ${port}`);
           resolve();
