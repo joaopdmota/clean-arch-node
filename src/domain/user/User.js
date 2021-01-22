@@ -4,15 +4,11 @@ const User = attributes({
   id: Number,
   name: {
     type: String,
-    required: true
+    required: true,
   },
-  age: Number
-})(class User {
-  isLegal() {
-    return this.age >= User.MIN_LEGAL_AGE;
-  }
-});
-
-User.MIN_LEGAL_AGE = 21;
+  age: Number,
+  updatedAt: Date,
+  createdAt: Date,
+})(class User {});
 
 module.exports = User;

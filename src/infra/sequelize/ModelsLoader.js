@@ -9,9 +9,8 @@ module.exports = {
       .readdirSync(baseFolder)
       .filter(file => (file.indexOf('.') !== 0) && (file !== indexFile) && (file.slice(-3) === '.js'))
       .forEach((file) => {
-        const model = sequelize.import(path.join(baseFolder, file));
-        const modelName = file.split('.')[0];
-        loaded[modelName] = model;
+        const model = require(path.join(baseFolder, file))(sequelize, Sequelize.DataTypes);
+        loaded[model.name] = model;
       });
     Object.keys(loaded).forEach((modelName) => {
       if (loaded[modelName].associate) {

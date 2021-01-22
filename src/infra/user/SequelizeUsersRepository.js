@@ -5,8 +5,8 @@ class SequelizeUsersRepository {
     this.UserModel = UserModel;
   }
 
-  async getAll(...args) {
-    const users = await this.UserModel.findAll(...args);
+  async getAll() {
+    const users = await this.UserModel.findAll();
 
     return users.map(UserMapper.toEntity);
   }
@@ -20,7 +20,7 @@ class SequelizeUsersRepository {
   async add(user) {
     const { valid, errors } = user.validate();
 
-    if(!valid) {
+    if (!valid) {
       const error = new Error('ValidationError');
       error.details = errors;
 
@@ -74,7 +74,7 @@ class SequelizeUsersRepository {
 
   async _getById(id) {
     try {
-      return await this.UserModel.findById(id, { rejectOnEmpty: true });
+      return await this.UserModel.findByPk(id, { rejectOnEmpty: true });
     } catch(error) {
       if(error.name === 'SequelizeEmptyResultError') {
         const notFoundError = new Error('NotFoundError');
