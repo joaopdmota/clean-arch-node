@@ -10,8 +10,16 @@ const {
   UpdateUser,
   DeleteUser
 } = require('./app/user');
+const {
+  CreateJob,
+  GetAllJobs,
+  GetJob,
+  UpdateJob,
+  DeleteJob
+} = require('./app/job');
 
 const UserSerializer = require('./interfaces/http/user/UserSerializer');
+const JobSerializer = require('./interfaces/http/job/JobSerializer');
 
 const Server = require('./interfaces/http/Server');
 const router = require('./interfaces/http/router');
@@ -22,7 +30,8 @@ const swaggerMiddleware = require('./interfaces/http/swagger/swaggerMiddleware')
 
 const logger = require('./infra/logging/logger');
 const SequelizeUsersRepository = require('./infra/user/SequelizeUsersRepository');
-const { database, User: UserModel } = require('./infra/database/models');
+const SequelizeJobRepository = require('./infra/job/SequelizeJobRepository');
+const { database, User: UserModel, Job: JobModel } = require('./infra/database/models');
 
 const container = createContainer();
 
@@ -53,27 +62,37 @@ container
 
 // Repositories
 container.register({
-  usersRepository: asClass(SequelizeUsersRepository).singleton()
+  usersRepository: asClass(SequelizeUsersRepository).singleton(),
+  jobRepository: asClass(SequelizeJobRepository).singleton()
 });
 
 // Database
 container.register({
   database: asValue(database),
-  UserModel: asValue(UserModel)
+  UserModel: asValue(UserModel),
+  JobModel: asValue(JobModel),
 });
 
 // Operations
 container.register({
+  // user
   createUser: asClass(CreateUser),
   getAllUsers: asClass(GetAllUsers),
   getUser: asClass(GetUser),
   updateUser: asClass(UpdateUser),
-  deleteUser: asClass(DeleteUser)
+  deleteUser: asClass(DeleteUser),
+  // job
+  createJob: asClass(CreateJob),
+  getAllJobs: asClass(GetAllJobs),
+  getJob: asClass(GetJob),
+  updateJob: asClass(UpdateJob),
+  deleteJob: asClass(DeleteJob),
 });
 
 // Serializers
 container.register({
-  userSerializer: asValue(UserSerializer)
+  userSerializer: asValue(UserSerializer),
+  jobSerializer: asValue(JobSerializer)
 });
 
 module.exports = container;
